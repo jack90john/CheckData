@@ -20,9 +20,24 @@ public class ApplicationMain {
         String  baseSql = "select * from service";
         List<ReturnData> baseList = query(baseSql);
 
+        List<CheckedData> checkedList = new ArrayList<>();
 
-        for (int i = 0; i < localList.size(); i++)
-            System.out.println(localList.get(i).getName());
+        for (int i = 0; i < localList.size(); i++){
+            String localName = localList.get(i).getName();
+            for(int j = 0; j<baseList.size(); j++){
+                if(localName != null && localName.equals(baseList.get(j).getName())){
+                    CheckedData checkedData = new CheckedData();
+                    checkedData.setLocalCode(localList.get(i).getCode());
+                    checkedData.setLocalName(localName);
+                    checkedData.setStandardCode(baseList.get(j).getCode());
+                    checkedData.setStandardName(baseList.get(j).getName());
+                    checkedList.add(checkedData);
+                    break;
+                }
+            }
+        }
+
+        ExportExcel.export(checkedList);
     }
 
     private static List<ReturnData> query(String sql){
