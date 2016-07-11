@@ -6,19 +6,20 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Created by John on 2016/7/7.
+ * Created by 蒋珂 on 2016/7/7.
+ * @version 1.0
  */
 
-public class DBHelper {
-    public static final String url = "jdbc:mysql://localhost:3306/sbzl";
-    public static final String name = "com.mysql.jdbc.Driver";
-    public static final String user = "root";
-    public static final String password = "root";
+class DBHelper {
+    private static final String url = "jdbc:mysql://localhost:3306/sbzl";
+    private static final String name = "com.mysql.jdbc.Driver";
+    private static final String user = "root";
+    private static final String password = "root";
 
-    public Connection conn = null;
-    public PreparedStatement pst = null;
+    private Connection conn = null;
+    PreparedStatement pst = null;
 
-    public DBHelper(String sql) {
+    DBHelper(String sql) {
         try {
             Class.forName(name);//指定连接类型
             conn = DriverManager.getConnection(url, user, password);//获取连接
@@ -28,7 +29,7 @@ public class DBHelper {
         }
     }
 
-    public void close() {
+    void close() {
         try {
             this.conn.close();
             this.pst.close();

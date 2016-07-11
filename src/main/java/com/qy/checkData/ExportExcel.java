@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 class ExportExcel {
-    static void export(List<CheckedData> list){
+    static void export(List<CheckedData> list, int sort){
         // 第一步，创建一个workbook，对应一个Excel文件
         HSSFWorkbook wb = new HSSFWorkbook();
         // 第二步，在workbook中添加一个sheet,对应Excel文件中的sheet
@@ -50,9 +50,15 @@ class ExportExcel {
         }
         // 第六步，将文件存到指定位置
         try {
-            FileOutputStream exportFile = new FileOutputStream("C:/Users/John/Desktop/checkData.xls");
-            wb.write(exportFile);
-            exportFile.close();
+            if(sort == 1){
+                FileOutputStream exportFile1 = new FileOutputStream("C:/Users/John/Desktop/checkData.xls");
+                wb.write(exportFile1);
+                exportFile1.close();
+            }else{
+                FileOutputStream exportFile2 = new FileOutputStream("C:/Users/John/Desktop/uncheckData.xls");
+                wb.write(exportFile2);
+                exportFile2.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

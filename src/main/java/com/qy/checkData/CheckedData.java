@@ -2,6 +2,7 @@ package com.qy.checkData;
 
 /**
  * Created by John on 2016/7/7.
+ * @version 1.0
  */
 public class CheckedData {
     private String localCode;
