@@ -51,11 +51,15 @@ class ExportExcel {
         // 第六步，将文件存到指定位置
         try {
             if(sort == 1){
-                FileOutputStream exportFile1 = new FileOutputStream("C:/Users/John/Desktop/checkData.xls");
+                FileOutputStream exportFile1 = new FileOutputStream("C:/Users/John/Desktop/checkData/checkData.xls");
                 wb.write(exportFile1);
                 exportFile1.close();
-            }else{
-                FileOutputStream exportFile2 = new FileOutputStream("C:/Users/John/Desktop/uncheckData.xls");
+            }else if(sort == 2){
+                FileOutputStream exportFile2 = new FileOutputStream("C:/Users/John/Desktop/checkData/uncheckData.xls");
+                wb.write(exportFile2);
+                exportFile2.close();
+            }else if(sort == 3){
+                FileOutputStream exportFile2 = new FileOutputStream("C:/Users/John/Desktop/checkData/needAddData.xls");
                 wb.write(exportFile2);
                 exportFile2.close();
             }

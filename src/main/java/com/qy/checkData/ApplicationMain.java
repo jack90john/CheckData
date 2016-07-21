@@ -14,9 +14,10 @@ public class ApplicationMain {
 
     private static List<CheckedData> checkedList = new ArrayList<>();
     private static List<CheckedData> uncheckedList = new ArrayList<>();
+    private static List<CheckedData> needAddList = new ArrayList<>();
 
     public static void main(String[] args) {
-        String sql = "select * from jiangsu";//SQL语句
+        String sql = "select * from henan";//SQL语句
         List<ReturnData> localList = query(sql);
 
         String baseSql = "select * from service";
@@ -26,6 +27,7 @@ public class ApplicationMain {
 
         ExportExcel.export(checkedList, 1);
         ExportExcel.export(uncheckedList, 2);
+        ExportExcel.export(needAddList, 3);
     }
 
     private static List<ReturnData> query(String sql) {
@@ -51,17 +53,21 @@ public class ApplicationMain {
         CheckedData checkedData = new CheckedData();
         checkedData.setLocalCode(aLocalList.getCode());
         checkedData.setLocalName(aLocalList.getName());
-        checkedData.setStandardCode(aBaseList.getCode());
-        checkedData.setStandardName(aBaseList.getName());
+        if (aBaseList != null){
+            checkedData.setStandardCode(aBaseList.getCode());
+            checkedData.setStandardName(aBaseList.getName());
+        }
         list.add(checkedData);
     }
 
     private static void compareWithName(List<ReturnData> localList, List<ReturnData> baseList) {
         List<ReturnData> waitForCodeList = new ArrayList<>();
+        //遍历每一个本地名称
         for (ReturnData aLocalList : localList) {
             String localName = aLocalList.getName();
             String localCode = aLocalList.getCode();
             boolean isPass = false;
+            //对每一个本地名称与标准名称做对比。
             for (ReturnData aBaseList : baseList) {
                 isPass = false;
                 String baseName = aBaseList.getName();
@@ -77,7 +83,8 @@ public class ApplicationMain {
                                 isPass = true;
                                 break;
                             }
-                        } else {  //服务代码不满6位的完全全匹配
+                        } else {
+                            //服务代码不满6位的完全全匹配
                             if (localCode.equals(baseCode)) {
                                 addToList(aLocalList, aBaseList, checkedList);
                                 isPass = true;
@@ -85,8 +92,7 @@ public class ApplicationMain {
                             }
                         }
                     }
-
-                    //加入未通过List输出
+                    //如果姓名相同，编码前六位未匹配上的加入未通过List输出
                     addToList(aLocalList, aBaseList, uncheckedList);
                     isPass = true;
                 }
@@ -101,21 +107,50 @@ public class ApplicationMain {
     }
 
     private static void compareWithCode(List<ReturnData> waitForCode, List<ReturnData> baseList) {
+        //遍历待匹配代码列表
         for (ReturnData aWaitForCode : waitForCode) {
             String localName = aWaitForCode.getName();
             String localCode = aWaitForCode.getCode();
-            for (ReturnData aBaseList : baseList) {
-                String baseName = aBaseList.getName();
-                String baseCode = aBaseList.getCode();
+            //对待匹配代码列表中的每一个代码与标准代码做比较
+            boolean isPass = false;
+            int z = 0;
+            boolean flag = false;
+            for(int i=0; i<baseList.size()-1; i++){
+                String baseName = baseList.get(i).getName();
+                String baseCode = baseList.get(i).getCode();
+                //如果代码相同则比较名称相似度，如果像是度大于0.75则通过，否则人工干预。
                 if (localCode != null && localCode.equals(baseCode)) {
+                    z = i; //记录代码相同位置
+                    flag = true; //是否有代码匹配标志
                     if (DataCompare.sim(localName, baseName) > 0.75) {
-                        addToList(aWaitForCode, aBaseList, checkedList);
+                        addToList(aWaitForCode, baseList.get(i), checkedList);
+                        isPass = true;
                         break;
                     }
-                    //加入未通过匹配列表
-                    addToList(aWaitForCode, aBaseList, uncheckedList);
                 }
             }
+            if(!isPass && flag){
+                //加入未通过匹配列表
+                addToList(aWaitForCode, baseList.get(z), uncheckedList);
+            }else if(!isPass && !flag){
+                addToList(aWaitForCode,null,needAddList);
+            }
+//            for (ReturnData aBaseList : baseList) {
+//                String baseName = aBaseList.getName();
+//                String baseCode = aBaseList.getCode();
+//                //如果代码相同则比较名称相似度，如果像是度大于0.75则通过，否则人工干预。
+//                if (localCode != null && localCode.equals(baseCode)) {
+//                    if (DataCompare.sim(localName, baseName) > 0.75) {
+//                        addToList(aWaitForCode, aBaseList, checkedList);
+//                        isPass = true;
+//                        break;
+//                    }
+//                }
+//            }
+//            if(!isPass){
+//                //加入未通过匹配列表
+//                addToList(aWaitForCode, aBaseList, uncheckedList);
+//            }
         }
     }
 }
